@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import DashboardView from '../components/DashboardView';
 import TrendsView from '../components/TrendsView';
+import { formatMonthLabel } from '../lib/constants';
 
 export default function HomePage() {
   const [meta, setMeta] = useState(null);
@@ -23,10 +24,10 @@ export default function HomePage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-          U.S. Visa Bulletin Tracker
+          U.S. Visa Bulletin Tracker &mdash; {meta ? formatMonthLabel(meta.latest) : '…'}
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Family-sponsored &amp; employment-based preference dates, January 2013 &ndash; June 2026
+          Family-sponsored &amp; employment-based preference dates
         </p>
       </header>
 
