@@ -7,7 +7,7 @@ import TrendsView from '../components/TrendsView';
 export default function HomePage() {
   const [meta, setMeta] = useState(null);
   const [error, setError] = useState(null);
-  const [tab, setTab] = useState('dashboard');
+  const [tab, setTab] = useState('trends');
 
   useEffect(() => {
     fetch('/api/meta')

@@ -39,3 +39,15 @@ export function formatMonthLabel(isoDate) {
   const d = new Date(Date.UTC(Number(y), Number(m) - 1, 1));
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
+
+const MONTH_ABBR = [
+  'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+];
+
+// USCIS visa bulletin tables print priority dates as DDMMMYY, e.g. "22DEC05".
+export function formatPriorityDate(isoDate) {
+  if (!isoDate) return isoDate;
+  const [y, m, d] = isoDate.split('-');
+  if (!y || !m || !d) return isoDate;
+  return `${d}${MONTH_ABBR[Number(m) - 1]}${y.slice(2)}`;
+}

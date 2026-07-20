@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { AREA_LABELS, TABLE_TYPES, formatMonthLabel, sortAreas } from '../lib/constants';
+import { AREA_LABELS, TABLE_TYPES, formatMonthLabel, formatPriorityDate, sortAreas } from '../lib/constants';
 
 function Cell({ row }) {
   if (!row) {
@@ -27,7 +27,7 @@ function Cell({ row }) {
   }
   return (
     <td className="px-3 py-2 text-center text-sm text-slate-700 font-mono">
-      {row.priority_date}
+      {formatPriorityDate(row.priority_date)}
     </td>
   );
 }
@@ -35,7 +35,7 @@ function Cell({ row }) {
 export default function DashboardView({ meta }) {
   const [bulletinDate, setBulletinDate] = useState(meta.latest);
   const [tableType, setTableType] = useState('Final Action');
-  const [broadFilter, setBroadFilter] = useState('All');
+  const [broadFilter, setBroadFilter] = useState('Employment-Based');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 

@@ -10,8 +10,10 @@ export default function TrendsView({ meta }) {
     (c) => c.broad_category === 'Employment-Based'
   );
 
-  const [broadFilter, setBroadFilter] = useState('Family-Sponsored');
-  const [category, setCategory] = useState(familyCategories[0]?.code || '');
+  const [broadFilter, setBroadFilter] = useState('Employment-Based');
+  const [category, setCategory] = useState(
+    employmentCategories.find((c) => c.code === 'EB2')?.code || employmentCategories[0]?.code || ''
+  );
   const [tableType, setTableType] = useState('Final Action');
   const [selectedAreas, setSelectedAreas] = useState(['ALL', 'CHINA', 'INDIA']);
   const [rawRows, setRawRows] = useState([]);
