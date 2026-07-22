@@ -12,6 +12,10 @@ export default function HomePage() {
   const [tab, setTab] = useState('trends');
   // undefined = not checked yet, null = no saved profile, {skipped:true} = skipped, else {category, priorityDate}
   const [profile, setProfile] = useState(undefined);
+  // Every fresh page load/reload starts at the welcome/onboarding screen,
+  // even if a case was saved previously -- this flips true once the user
+  // confirms or skips it for the rest of this page session.
+  const [acknowledged, setAcknowledged] = useState(false);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
@@ -40,11 +44,12 @@ export default function HomePage() {
       // localStorage unavailable; profile just won't persist across reloads
     }
     setProfile(p);
+    setAcknowledged(true);
     setEditing(false);
   }
 
   const hasCase = Boolean(profile && !profile.skipped);
-  const showOnboarding = profile === null || editing;
+  const showOnboarding = profile === undefined || !acknowledged || editing;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
