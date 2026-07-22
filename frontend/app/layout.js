@@ -1,8 +1,41 @@
 import './globals.css';
 
+const SITE_URL = 'https://green-card-bulletin-tracker.vercel.app';
+const TITLE = 'U.S. Visa Bulletin Tracker';
+const DESCRIPTION =
+  'Track U.S. Department of State Visa Bulletin final action & filing dates back to January 2013. See historical trends by category and country, and where your own priority date stands.';
+
 export const metadata = {
-  title: 'U.S. Visa Bulletin Tracker',
-  description: 'Historical U.S. Visa Bulletin final action & filing dates, January 2013 - June 2026',
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  keywords: [
+    'visa bulletin',
+    'visa bulletin tracker',
+    'priority date',
+    'green card priority date',
+    'USCIS visa bulletin',
+    'final action date',
+    'dates for filing',
+    'EB-2',
+    'EB-3',
+    'family sponsored visa',
+    'employment based visa',
+  ],
+  robots: { index: true, follow: true },
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: TITLE,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }) {
