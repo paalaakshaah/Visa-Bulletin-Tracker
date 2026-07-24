@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { track } from '@vercel/analytics';
 import TrendChart from './TrendChart';
+import UscisCaseStatusLink from './UscisCaseStatusLink';
 import { AREA_LABELS, TABLE_TYPES, inferBroadCategory, sortAreas } from '../lib/constants';
 
 const SERIES_KEY_SEP = '::';
@@ -302,6 +303,8 @@ export default function TrendsView({ meta, profile }) {
           month. Each line is one category &middot; country combination.
         </p>
       </div>
+
+      <UscisCaseStatusLink />
     </div>
   );
 }

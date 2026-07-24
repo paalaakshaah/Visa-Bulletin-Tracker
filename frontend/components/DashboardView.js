@@ -10,6 +10,7 @@ import {
   inferBroadCategory,
   sortAreas,
 } from '../lib/constants';
+import UscisCaseStatusLink from './UscisCaseStatusLink';
 
 const MOVEMENT_LABELS = {
   BECAME_CURRENT: { text: 'Became Current', tone: 'positive' },
@@ -242,6 +243,8 @@ export default function DashboardView({ meta, profile }) {
           )}
         </>
       )}
+
+      <UscisCaseStatusLink />
     </div>
   );
 }
