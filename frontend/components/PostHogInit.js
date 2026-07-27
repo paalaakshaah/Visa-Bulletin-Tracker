@@ -10,10 +10,7 @@ export default function PostHogInit() {
     if (!key) return;
     posthog.init(key, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-      // Vercel Analytics already covers pageviews; PostHog here is only for
-      // the custom engagement events (onboarding, tab/category/country
-      // selection).
-      capture_pageview: false,
+      capture_pageview: true,
       person_profiles: 'identified_only',
     });
   }, []);
