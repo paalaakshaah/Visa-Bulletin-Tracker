@@ -81,7 +81,8 @@ Insight id: `10498146`
 
 Daily count of `tab_changed` events (fired in `frontend/app/page.js` when
 the Dashboard/Trends nav buttons are clicked), broken down by the `tab`
-event property so each tab gets its own line.
+event property so each tab gets its own bar, displayed as a per-day bar
+chart (`trendsFilter.display: "ActionsBar"`).
 
 ```bash
 curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
@@ -104,7 +105,11 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   }'
 ```
 
-Insight id: `10498152`
+Insight id: `10498152`. Later updated (via `PATCH
+/api/projects/525462/insights/10498152/`) to render as a bar chart instead
+of the default line chart, by adding `"trendsFilter": { "display":
+"ActionsBar" }` to the `query.source` object alongside the existing
+`breakdownFilter` and `interval`.
 
 ## 4. USCIS case status button clicks
 
