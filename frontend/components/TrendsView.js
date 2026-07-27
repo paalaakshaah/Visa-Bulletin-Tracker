@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 import TrendChart from './TrendChart';
 import UscisCaseStatusLink from './UscisCaseStatusLink';
 import { AREA_LABELS, TABLE_TYPES, inferBroadCategory, sortAreas } from '../lib/constants';
@@ -154,7 +154,7 @@ export default function TrendsView({ meta, profile }) {
   function toggleArea(code) {
     setSelectedAreas((prev) => {
       const adding = !prev.includes(code);
-      track('country_selected', { country: code, selected: adding });
+      posthog.capture('country_selected', { country: code, selected: adding });
       return adding ? [...prev, code] : prev.filter((a) => a !== code);
     });
   }
@@ -162,7 +162,7 @@ export default function TrendsView({ meta, profile }) {
   function toggleCategory(code) {
     setSelectedCategories((prev) => {
       const adding = !prev.includes(code);
-      track('category_selected', { category: code, selected: adding });
+      posthog.capture('category_selected', { category: code, selected: adding });
       return adding ? [...prev, code] : prev.filter((c) => c !== code);
     });
   }

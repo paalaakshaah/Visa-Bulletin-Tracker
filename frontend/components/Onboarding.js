@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 import { AREA_LABELS, inferBroadCategory, sortAreas } from '../lib/constants';
 
 export default function Onboarding({ meta, initial, onComplete, onSkip }) {
@@ -31,12 +31,12 @@ export default function Onboarding({ meta, initial, onComplete, onSkip }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (!category || !priorityMonth) return;
-    track('onboarding_completed', { category, area });
+    posthog.capture('onboarding_completed', { category, area });
     onComplete({ category, priorityDate: `${priorityMonth}-01`, area });
   }
 
   function handleSkip() {
-    track('onboarding_skipped');
+    posthog.capture('onboarding_skipped');
     onSkip();
   }
 

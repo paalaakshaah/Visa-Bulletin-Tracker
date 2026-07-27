@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 import DashboardView from '../components/DashboardView';
 import TrendsView from '../components/TrendsView';
 import Onboarding from '../components/Onboarding';
@@ -117,7 +117,7 @@ export default function HomePage() {
               <button
                 key={t.id}
                 onClick={() => {
-                  track('tab_changed', { tab: t.id });
+                  posthog.capture('tab_changed', { tab: t.id });
                   setTab(t.id);
                 }}
                 className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
