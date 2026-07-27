@@ -79,10 +79,16 @@ Insight id: `10498146`
 
 ## 3. Dashboard vs Trends tab clicks
 
-Daily count of `tab_changed` events (fired in `frontend/app/page.js` when
-the Dashboard/Trends nav buttons are clicked), broken down by the `tab`
-event property so each tab gets its own bar, displayed as a per-day bar
-chart (`trendsFilter.display: "ActionsBar"`).
+Daily count of `tab_changed` events, broken down by the `tab` event
+property so each tab gets its own bar, displayed as a per-day bar chart
+(`trendsFilter.display: "ActionsBar"`).
+
+This tracks tab *views*, not just clicks: `frontend/app/page.js` fires
+`tab_changed` both when the nav buttons are clicked and via a `useEffect`
+whenever the currently-shown tab changes (including once on initial
+render). Trends is the default tab, so a user who never clicks a tab
+button still counts as a Trends view -- without this, only explicit clicks
+were tracked and the default Trends landing was invisible in this metric.
 
 ```bash
 curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
