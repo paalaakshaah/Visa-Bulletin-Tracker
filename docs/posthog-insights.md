@@ -181,7 +181,47 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   }'
 ```
 
-Insight id: _run the command above and record the returned `id` here._
+Insight id: `10574071`
+
+## 6. Onboarding completed by country
+
+Daily count of `onboarding_completed` events (fired from
+`frontend/components/Onboarding.js`), broken down by the `area` event
+property so each country of birth gets its own colored line -- default
+Trends line-chart display (no `trendsFilter.display` override, unlike
+insights #3 and #5 which force a bar chart).
+
+`area` holds the raw country code selected in the onboarding form (see
+`AREA_LABELS` in `frontend/lib/constants.js`): `ALL` (All Other Countries),
+`CHINA`, `INDIA`, `MEXICO`, `PHILIPPINES`, `VIETNAM`, `EL_SV_GT_HN` (El
+Salvador / Guatemala / Honduras).
+
+Built on `onboarding_completed` specifically (not `onboarding_skipped`),
+so anyone who skips onboarding never fires this event and never
+contributes a data point -- the graph only ever reflects completions.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completed by country",
+    "dashboards": [1912995],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          { "kind": "EventsNode", "event": "onboarding_completed", "name": "onboarding_completed", "math": "total" }
+        ],
+        "interval": "day",
+        "breakdownFilter": { "breakdown_type": "event", "breakdown": "area" }
+      }
+    }
+  }'
+```
+
+Insight id: `10575258`
 
 ## Notes
 
