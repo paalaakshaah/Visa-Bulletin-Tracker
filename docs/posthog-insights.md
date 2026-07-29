@@ -1,12 +1,20 @@
 # PostHog Insights
 
-All insights below live on the **Engagement** dashboard
-(`https://us.posthog.com/project/525462/dashboard/1912995`) and were created
-via PostHog's REST API (`https://us.posthog.com/api/projects/525462/...`)
-rather than through the UI, using a Personal API Key scoped to
-`insight:write` + `dashboard:write`.
+All insights below were created via PostHog's REST API
+(`https://us.posthog.com/api/projects/525462/...`) rather than through the
+UI, using a Personal API Key scoped to `insight:write` + `dashboard:write`.
 
-## Dashboard
+They're split across two dashboards, since PostHog dashboards don't
+support in-page tabs -- this is the closest equivalent (two separate pages
+filed next to each other) rather than mixing everything on one page with a
+section header (which was tried first and dropped):
+
+- **Engagement** (`https://us.posthog.com/project/525462/dashboard/1912995`)
+  -- general site engagement: #2-#4.
+- **Onboarding** (`https://us.posthog.com/project/525462/dashboard/1926163`)
+  -- everything about the onboarding funnel: #1, #5-#9.
+
+## Dashboards
 
 ```bash
 curl -s -X POST "https://us.posthog.com/api/projects/525462/dashboards/" \
@@ -17,38 +25,43 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/dashboards/" \
 
 Created dashboard id: `1912995`
 
-## 1. Onboarding completion rate (% of daily users)
-
-Percentage of daily unique users who complete the welcome/onboarding form
-(`onboarding_completed`) vs. skip it (`onboarding_skipped`), using a
-formula so the two are shown as a single normalized percentage rather than
-raw counts.
-
 ```bash
-curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+curl -s -X POST "https://us.posthog.com/api/projects/525462/dashboards/" \
   -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Onboarding completion rate (% of daily users)",
-    "dashboards": [1912995],
-    "query": {
-      "kind": "InsightVizNode",
-      "source": {
-        "kind": "TrendsQuery",
-        "series": [
-          { "kind": "EventsNode", "event": "onboarding_completed", "name": "onboarding_completed", "math": "dau" },
-          { "kind": "EventsNode", "event": "onboarding_skipped", "name": "onboarding_skipped", "math": "dau" }
-        ],
-        "interval": "day",
-        "trendsFilter": { "formula": "A / (A + B) * 100" }
-      }
-    }
-  }'
+  -d '{"name": "Onboarding", "description": "Visa Bulletin Tracker onboarding funnel metrics", "folder": "Unfiled/Dashboards"}'
 ```
 
-Insight id: `10497454`
+Created dashboard id: `1926163`. Filed in the same folder as Engagement
+(`folder` isn't settable at creation time -- it came back `null` and had
+to be set via a follow-up `PATCH`) and pinned, so it's as easy to find as
+Engagement in the dashboard list.
 
-## 2. Page visits
+Insights #1 and #5-#9 were originally created on the Engagement dashboard
+(with a `## Onboarding` markdown text-card header grouping them, per an
+earlier iteration of this doc), then relocated to the new Onboarding
+dashboard one tile at a time via the (undocumented) `move_tile` endpoint:
+
+```bash
+curl -s -X PATCH "https://us.posthog.com/api/projects/525462/dashboards/1912995/move_tile/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"to_dashboard": 1926163, "tile": {"id": <dashboard_tile_id>}}'
+```
+
+Note `<dashboard_tile_id>` is the dashboard *tile* id (from a dashboard's
+`tiles[].id`), not the insight id. The header text tile was left behind
+with no tiles under it and disappeared on its own -- no explicit deletion
+call was needed.
+
+The `dashboards` array in each insight's creation command below reflects
+where it lives now (Onboarding dashboard id `1926163` for the onboarding
+insights), not the Engagement id it may have originally been created
+under.
+
+## Engagement dashboard
+
+### 2. Page visits
 
 Daily count of `$pageview` events. Requires `capture_pageview: true` in
 `frontend/components/PostHogInit.js` (Vercel Analytics also tracks
@@ -77,7 +90,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10498146`
 
-## 3. Dashboard vs Trends tab clicks
+### 3. Dashboard vs Trends tab clicks
 
 Daily count of `tab_changed` events, broken down by the `tab` event
 property so each tab gets its own bar, displayed as a per-day bar chart
@@ -117,7 +130,7 @@ of the default line chart, by adding `"trendsFilter": { "display":
 "ActionsBar" }` to the `query.source` object alongside the existing
 `breakdownFilter` and `interval`.
 
-## 4. USCIS case status button clicks
+### 4. USCIS case status button clicks
 
 Daily count of `uscis_status_clicked` events, fired from
 `frontend/components/UscisCaseStatusLink.js` when the "Check My Case
@@ -146,7 +159,40 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10498155`
 
-## 5. Onboarding completed vs skipped (bar chart)
+## Onboarding dashboard
+
+### 1. Onboarding completion rate (% of daily users)
+
+Percentage of daily unique users who complete the welcome/onboarding form
+(`onboarding_completed`) vs. skip it (`onboarding_skipped`), using a
+formula so the two are shown as a single normalized percentage rather than
+raw counts.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completion rate (% of daily users)",
+    "dashboards": [1926163],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          { "kind": "EventsNode", "event": "onboarding_completed", "name": "onboarding_completed", "math": "dau" },
+          { "kind": "EventsNode", "event": "onboarding_skipped", "name": "onboarding_skipped", "math": "dau" }
+        ],
+        "interval": "day",
+        "trendsFilter": { "formula": "A / (A + B) * 100" }
+      }
+    }
+  }'
+```
+
+Insight id: `10497454`
+
+### 5. Onboarding completed vs skipped (bar chart)
 
 Daily count of `onboarding_completed` vs `onboarding_skipped` events (both
 fired from `frontend/components/Onboarding.js`), shown as two side-by-side
@@ -165,7 +211,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Onboarding completed vs skipped",
-    "dashboards": [1912995],
+    "dashboards": [1926163],
     "query": {
       "kind": "InsightVizNode",
       "source": {
@@ -183,7 +229,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10574071`
 
-## 6. Onboarding completed by country
+### 6. Onboarding completed by country
 
 Daily count of `onboarding_completed` events (fired from
 `frontend/components/Onboarding.js`), broken down by the `area` event
@@ -206,7 +252,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Onboarding completed by country",
-    "dashboards": [1912995],
+    "dashboards": [1926163],
     "query": {
       "kind": "InsightVizNode",
       "source": {
@@ -223,7 +269,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10575258`
 
-## 7. Onboarding completed by family subcategory
+### 7. Onboarding completed by family subcategory
 
 Same idea as #6, but scoped to the Family-Sponsored group and broken down
 by `category` instead of `area`: one line per family subcategory (`F1`,
@@ -239,7 +285,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Onboarding completed by family subcategory",
-    "dashboards": [1912995],
+    "dashboards": [1926163],
     "query": {
       "kind": "InsightVizNode",
       "source": {
@@ -264,7 +310,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10575415`
 
-## 8. Onboarding completed by employment subcategory
+### 8. Onboarding completed by employment subcategory
 
 Same as #7, but scoped to the Employment-Based group: one line per EB
 subcategory (`EB1`, `EB2`, `EB3`, `EB3-OW`, `EB4`, `EB4-R`, `EB5`,
@@ -279,7 +325,7 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Onboarding completed by employment subcategory",
-    "dashboards": [1912995],
+    "dashboards": [1926163],
     "query": {
       "kind": "InsightVizNode",
       "source": {
@@ -303,6 +349,58 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 ```
 
 Insight id: `10575416`
+
+### 9. Onboarding completed: family vs employment (bar chart)
+
+Daily count of `onboarding_completed` events, split into two bars per day
+-- Family-Sponsored vs Employment-Based -- rather than one bar per
+individual subcategory like #7/#8. Since the event only carries the
+specific `category` code (not a broad-group property), this uses two
+series on the same `onboarding_completed` event, each with the same
+`exact`-operator `category` property filter as #7 and #8, just aggregated
+under a single named series instead of broken down per-code.
+`trendsFilter.display: "ActionsBar"` renders it as a bar chart, matching
+insights #3 and #5.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completed: family vs employment",
+    "dashboards": [1926163],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          {
+            "kind": "EventsNode",
+            "event": "onboarding_completed",
+            "name": "Family-Sponsored",
+            "math": "total",
+            "properties": [
+              { "key": "category", "type": "event", "operator": "exact", "value": ["F1","F2A","F2B","F3","F4"] }
+            ]
+          },
+          {
+            "kind": "EventsNode",
+            "event": "onboarding_completed",
+            "name": "Employment-Based",
+            "math": "total",
+            "properties": [
+              { "key": "category", "type": "event", "operator": "exact", "value": ["EB1","EB2","EB3","EB3-OW","EB4","EB4-R","EB5","EB5-NonRegional","EB5-Regional","EB5-Unreserved","EB5-Rural","EB5-HighUnemployment","EB5-Infrastructure"] }
+            ]
+          }
+        ],
+        "interval": "day",
+        "trendsFilter": { "display": "ActionsBar" }
+      }
+    }
+  }'
+```
+
+Insight id: `10575476`
 
 ## Notes
 
