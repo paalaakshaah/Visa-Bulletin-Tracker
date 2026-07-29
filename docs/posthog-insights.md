@@ -223,6 +223,87 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10575258`
 
+## 7. Onboarding completed by family subcategory
+
+Same idea as #6, but scoped to the Family-Sponsored group and broken down
+by `category` instead of `area`: one line per family subcategory (`F1`,
+`F2A`, `F2B`, `F3`, `F4` -- see `db/schema.sql` for the full code list).
+An `exact`-operator property filter on `category` restricts the underlying
+series to just those five codes before the breakdown runs, so Employment-
+Based submissions never show up as lines here. Default line-chart display,
+built on `onboarding_completed` so skips never populate it.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completed by family subcategory",
+    "dashboards": [1912995],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          {
+            "kind": "EventsNode",
+            "event": "onboarding_completed",
+            "name": "onboarding_completed",
+            "math": "total",
+            "properties": [
+              { "key": "category", "type": "event", "operator": "exact", "value": ["F1","F2A","F2B","F3","F4"] }
+            ]
+          }
+        ],
+        "interval": "day",
+        "breakdownFilter": { "breakdown_type": "event", "breakdown": "category" }
+      }
+    }
+  }'
+```
+
+Insight id: `10575415`
+
+## 8. Onboarding completed by employment subcategory
+
+Same as #7, but scoped to the Employment-Based group: one line per EB
+subcategory (`EB1`, `EB2`, `EB3`, `EB3-OW`, `EB4`, `EB4-R`, `EB5`,
+`EB5-NonRegional`, `EB5-Regional`, `EB5-Unreserved`, `EB5-Rural`,
+`EB5-HighUnemployment`, `EB5-Infrastructure`). Same `exact`-operator
+property filter approach, just against the Employment-Based code list
+instead of the Family-Sponsored one.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completed by employment subcategory",
+    "dashboards": [1912995],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          {
+            "kind": "EventsNode",
+            "event": "onboarding_completed",
+            "name": "onboarding_completed",
+            "math": "total",
+            "properties": [
+              { "key": "category", "type": "event", "operator": "exact", "value": ["EB1","EB2","EB3","EB3-OW","EB4","EB4-R","EB5","EB5-NonRegional","EB5-Regional","EB5-Unreserved","EB5-Rural","EB5-HighUnemployment","EB5-Infrastructure"] }
+            ]
+          }
+        ],
+        "interval": "day",
+        "breakdownFilter": { "breakdown_type": "event", "breakdown": "category" }
+      }
+    }
+  }'
+```
+
+Insight id: `10575416`
+
 ## Notes
 
 - `$POSTHOG_PERSONAL_API_KEY` above is a placeholder -- never commit an
