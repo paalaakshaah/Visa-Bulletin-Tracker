@@ -58,8 +58,6 @@ export function inferBroadCategory(categoryCode) {
   return categoryCode && categoryCode.startsWith('EB') ? 'Employment-Based' : 'Family-Sponsored';
 }
 
-export const VISA_PROFILE_KEY = 'visaBulletinProfile';
-
 // Compact, human-readable rendering of a day delta, e.g. 45 -> "45d",
 // 90 -> "3mo", 800 -> "2.2y". Sign is included.
 export function formatDeltaDays(days) {

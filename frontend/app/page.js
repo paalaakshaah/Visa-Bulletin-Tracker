@@ -5,17 +5,16 @@ import posthog from 'posthog-js';
 import DashboardView from '../components/DashboardView';
 import TrendsView from '../components/TrendsView';
 import Onboarding from '../components/Onboarding';
-import { AREA_LABELS, formatMonthLabel, formatPriorityDate, VISA_PROFILE_KEY } from '../lib/constants';
+import { AREA_LABELS, formatMonthLabel, formatPriorityDate } from '../lib/constants';
 
 export default function HomePage() {
   const [meta, setMeta] = useState(null);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState('trends');
-  // undefined = not checked yet, null = no saved profile, {skipped:true} = skipped, else {category, priorityDate}
-  const [profile, setProfile] = useState(undefined);
-  // Every fresh page load/reload starts at the welcome/onboarding screen,
-  // even if a case was saved previously -- this flips true once the user
-  // confirms or skips it for the rest of this page session.
+  // Nothing is persisted across reloads -- every fresh page load starts
+  // with no case on file (null), until the user fills out onboarding again.
+  // null = no case, {skipped:true} = skipped, else {category, priorityDate}
+  const [profile, setProfile] = useState(null);
   const [acknowledged, setAcknowledged] = useState(false);
   const [editing, setEditing] = useState(false);
 
@@ -29,28 +28,14 @@ export default function HomePage() {
       .catch((e) => setError(e.message));
   }, []);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(VISA_PROFILE_KEY);
-      setProfile(saved ? JSON.parse(saved) : null);
-    } catch {
-      setProfile(null);
-    }
-  }, []);
-
   function saveProfile(p) {
-    try {
-      localStorage.setItem(VISA_PROFILE_KEY, JSON.stringify(p));
-    } catch {
-      // localStorage unavailable; profile just won't persist across reloads
-    }
     setProfile(p);
     setAcknowledged(true);
     setEditing(false);
   }
 
   const hasCase = Boolean(profile && !profile.skipped);
-  const showOnboarding = profile === undefined || !acknowledged || editing;
+  const showOnboarding = !acknowledged || editing;
 
   // Track which tab is actually being *viewed*, not just clicked -- Trends
   // is the default tab, so someone who never clicks a tab button still
