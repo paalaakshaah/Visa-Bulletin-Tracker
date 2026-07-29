@@ -146,6 +146,43 @@ curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
 
 Insight id: `10498155`
 
+## 5. Onboarding completed vs skipped (bar chart)
+
+Daily count of `onboarding_completed` vs `onboarding_skipped` events (both
+fired from `frontend/components/Onboarding.js`), shown as two side-by-side
+bars per day (`trendsFilter.display: "ActionsBar"`) -- same bar-chart style
+as insight #3, but using two event series instead of a property breakdown,
+since completion and skip are already distinct events rather than one event
+with a property.
+
+This is a raw-count companion to insight #1 (which shows the same two
+events as a normalized daily percentage); this one shows the actual volume
+of each.
+
+```bash
+curl -s -X POST "https://us.posthog.com/api/projects/525462/insights/" \
+  -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Onboarding completed vs skipped",
+    "dashboards": [1912995],
+    "query": {
+      "kind": "InsightVizNode",
+      "source": {
+        "kind": "TrendsQuery",
+        "series": [
+          { "kind": "EventsNode", "event": "onboarding_completed", "name": "onboarding_completed", "math": "total" },
+          { "kind": "EventsNode", "event": "onboarding_skipped", "name": "onboarding_skipped", "math": "total" }
+        ],
+        "interval": "day",
+        "trendsFilter": { "display": "ActionsBar" }
+      }
+    }
+  }'
+```
+
+Insight id: _run the command above and record the returned `id` here._
+
 ## Notes
 
 - `$POSTHOG_PERSONAL_API_KEY` above is a placeholder -- never commit an
